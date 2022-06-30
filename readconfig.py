@@ -1,8 +1,4 @@
-#!/usr/bin/env python -u
 import os
-import sys
-
-sys.stdout.flush()
 
 def read_config_file():
     env = os.environ['Environment']
@@ -15,6 +11,5 @@ def load_config_file():
     file = open(config_file_name)
     config_data = json.load(file)
     print(json.dumps(config_data, indent=4))
-    prin("Hello world")
     return config_data
     
