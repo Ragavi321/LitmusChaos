@@ -1,0 +1,17 @@
+{
+    "litmus":{
+        "litmus_url":"",
+        "litmus_project_id":"",
+        "env": "qa"
+    },
+    "pod_delete":{
+        "eks_ns":"default",
+        "eks_pod":"nginx",
+        "env": "qa"
+    },
+    "pod_nw_slowness":{
+        "eks_ns":"default",
+        "eks_pod":"nginx",
+        "env": "qa"
+    }
+}
