@@ -1,4 +1,6 @@
 import os
+import sys
+sys.stdout.flush()
 
 def read_config_file():
     env = os.environ['Environment']
