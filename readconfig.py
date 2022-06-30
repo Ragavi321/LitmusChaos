@@ -1,5 +1,7 @@
+#!/usr/bin/env python -u
 import os
 import sys
+
 sys.stdout.flush()
 
 def read_config_file():
