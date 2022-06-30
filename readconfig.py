@@ -11,6 +11,8 @@ def load_config_file():
     config_file_name = read_config_file()
     file = open(config_file_name)
     config_data = json.load(file)
-    print(config_data)
     return config_data
+
+data = load_config_file()
+print(data)
     
