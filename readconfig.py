@@ -10,6 +10,6 @@ def load_config_file():
     config_file_name = read_config_file()
     file = open(config_file_name)
     config_data = json.load(file)
-    print(json.dumps(config_data))
+    print(json.dumps(config_data, indent=4))
     return config_data
     
