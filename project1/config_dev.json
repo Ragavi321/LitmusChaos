@@ -1,7 +1,7 @@
 {
     "litmus":{
-        "litmus_url":"",
-        "litmus_project_id":"",
+        "litmus_url":"https://litmus-dev.np.aella.tech",
+        "litmus_project_id":"5539c642-f80f-443d-a21b-406379f8df48",
         "env": "dev"
     },
     "pod_delete":{
@@ -13,5 +13,11 @@
         "eks_ns":"default",
         "eks_pod":"nginx",
         "env": "dev"
+    },
+    "mongo_atlas":{
+        "pub_key": "oovlrhyw",
+        "private_key": "2d8ecc3c-c77f-4e75-a0fb-ecb282111eeb",
+        "env": "dev",
+        "atlas_url":"https://cloud.mongodb.com/api/atlas/v1.5/groups/62c3eac32d1f361da4e16ffd/clusters/atlas-techx-ota-dev/restartPrimaries?pretty=true%22"
     }
 }
