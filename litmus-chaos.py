@@ -8,8 +8,8 @@ import sys
 from requests.auth import HTTPDigestAuth
 
 LITMUS_URL = ''
-LITMUS_USERNAME = ''
-LITMUS_PASSWORD = ''
+LITMUS_USERNAME = 'admin'
+LITMUS_PASSWORD = 'litmus'
 LITMUS_PROJECT_ID = ''
 MONGODB_ATLAS_PUBLIC_KEY = ''
 MONGODB_ATLAS_PRIVATE_KEY = ''
@@ -210,7 +210,7 @@ def get_ps_custom_experiment_body(workflow_name, experiment_name):
 
     if experiment_name == 'ATLAS':
         mongo_atlas_cluster_url_value = mongo_atlas['atlas_url']
-        mongo_cluster_private_key_value = mongo_atlas['public_key']
+        mongo_cluster_private_key_value = mongo_atlas['pub_key']
         mongo_cluster_public_key_value = mongo_atlas['private_key']
     elif experiment_name == 'KAFKA':
         kafka_aws_region_value = kafka['kafka_aws_region']
@@ -335,7 +335,7 @@ def load_config_file():
 
 #############################################################################################################
 def read_config_file():
-    env = os.environ['environment_type']
+    env = os.environ['environment_name']
     project = os.environ['project_name']
     print('PROJECT NAME : ' + project)
     print('ENV NAME : ' + env)
@@ -353,8 +353,6 @@ if __name__ == '__main__':
     redis = config_data_res['redis']
 
     LITMUS_URL = litmus_config['litmus_url']
-    LITMUS_USERNAME = os.environ['litmus_username']
-    LITMUS_PASSWORD = os.environ['litmus_password']
     experiment_type = os.environ['experiment_type']
     LITMUS_PROJECT_ID = litmus_config['litmus_project_id']
     LITMUS_CLUSTER_ID = get_cluster_id()
