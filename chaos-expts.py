@@ -7,10 +7,10 @@ import os
 import sys
 from requests.auth import HTTPDigestAuth
 
-LITMUS_URL = 'http://a61be9f85c8fb47de989a1ad6e2773b3-2105213535.us-east-1.elb.amazonaws.com:9091'
+LITMUS_URL = 'http://a8155901c8f774540873a6814e70b50f-1024036079.us-east-1.elb.amazonaws.com:9091'
 LITMUS_USERNAME = 'admin'
 LITMUS_PASSWORD = 'litmus'
-LITMUS_PROJECT_ID = '5539c642-f80f-443d-a21b-406379f8df48'
+LITMUS_PROJECT_ID = 'b9055d57-442a-4e49-b60d-ec3da66d13fa'
 MONGODB_ATLAS_PUBLIC_KEY = 'oovlrhyw'
 MONGODB_ATLAS_PRIVATE_KEY = '2d8ecc3c-c77f-4e75-a0fb-ecb282111eeb'
 LITMUS_PROJECT_ID = ''
@@ -77,146 +77,28 @@ def get_pod_kill_request_body(workflow_name, namespace, deployment):
     cluster_id = get_cluster_id()
     isCustomWorkflow = bool(True)
 
-    data = {'operationName': 'createChaosWorkFlow',
-            'variables': {'ChaosWorkFlowInput': {
-                'workflow_manifest': '''{
-  "apiVersion": "argoproj.io/v1alpha1",
-  "kind": "Workflow",
-  "metadata": {
-    "name": "updated_workflow_name",
-    "namespace": "litmus",
-    "labels": {
-      "subject": "pod-kill-chaos-workflow_litmus"
-    }
-  },
-  "spec": {
-    "arguments": {
-      "parameters": [
-        {
-          "name": "adminModeNamespace",
-          "value": "litmus"
+    data = {
+    "operationName": "createChaosWorkFlow",
+    "variables": {
+        "request": {
+            "workflowManifest": "{\n  \"apiVersion\": \"argoproj.io/v1alpha1\",\n  \"kind\": \"Workflow\",\n  \"metadata\": {\n    \"name\": \"custom-chaos-workflow-1657253766\",\n    \"namespace\": \"litmus\",\n    \"labels\": {\n      \"subject\": \"custom-chaos-workflow_litmus\"\n    }\n  },\n  \"spec\": {\n    \"arguments\": {\n      \"parameters\": [\n        {\n          \"name\": \"adminModeNamespace\",\n          \"value\": \"litmus\"\n        }\n      ]\n    },\n    \"entrypoint\": \"custom-chaos\",\n    \"securityContext\": {\n      \"runAsNonRoot\": true,\n      \"runAsUser\": 1000\n    },\n    \"serviceAccountName\": \"argo-chaos\",\n    \"templates\": [\n      {\n        \"name\": \"custom-chaos\",\n        \"steps\": [\n          [\n            {\n              \"name\": \"install-chaos-experiments\",\n              \"template\": \"install-chaos-experiments\"\n            }\n          ],\n          [\n            {\n              \"name\": \"pod-delete-dzb\",\n              \"template\": \"pod-delete-dzb\"\n            }\n          ],\n          [\n            {\n              \"name\": \"revert-chaos\",\n              \"template\": \"revert-chaos\"\n            }\n          ]\n        ]\n      },\n      {\n        \"name\": \"install-chaos-experiments\",\n        \"inputs\": {\n          \"artifacts\": [\n            {\n              \"name\": \"pod-delete-dzb\",\n              \"path\": \"/tmp/pod-delete-dzb.yaml\",\n              \"raw\": {\n                \"data\": \"apiVersion: litmuschaos.io/v1alpha1\\ndescription:\\n  message: |\\n    Deletes a pod belonging to a deployment/statefulset/daemonset\\nkind: ChaosExperiment\\nmetadata:\\n  name: pod-delete\\n  labels:\\n    name: pod-delete\\n    app.kubernetes.io/part-of: litmus\\n    app.kubernetes.io/component: chaosexperiment\\n    app.kubernetes.io/version: 2.9.0\\nspec:\\n  definition:\\n    scope: Namespaced\\n    permissions:\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods\\n        verbs:\\n          - create\\n          - delete\\n          - get\\n          - list\\n          - patch\\n          - update\\n          - deletecollection\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - events\\n        verbs:\\n          - create\\n          - get\\n          - list\\n          - patch\\n          - update\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - configmaps\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods/log\\n        verbs:\\n          - get\\n          - list\\n          - watch\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods/exec\\n        verbs:\\n          - get\\n          - list\\n          - create\\n      - apiGroups:\\n          - apps\\n        resources:\\n          - deployments\\n          - statefulsets\\n          - replicasets\\n          - daemonsets\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - apps.openshift.io\\n        resources:\\n          - deploymentconfigs\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - replicationcontrollers\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - argoproj.io\\n        resources:\\n          - rollouts\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - batch\\n        resources:\\n          - jobs\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - delete\\n          - deletecollection\\n      - apiGroups:\\n          - litmuschaos.io\\n        resources:\\n          - chaosengines\\n          - chaosexperiments\\n          - chaosresults\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - patch\\n          - update\\n          - delete\\n    image: litmuschaos/go-runner:2.9.0\\n    imagePullPolicy: Always\\n    args:\\n      - -c\\n      - ./experiments -name pod-delete\\n    command:\\n      - /bin/bash\\n    env:\\n      - name: TOTAL_CHAOS_DURATION\\n        value: \\\"15\\\"\\n      - name: RAMP_TIME\\n        value: \\\"\\\"\\n      - name: FORCE\\n        value: \\\"true\\\"\\n      - name: CHAOS_INTERVAL\\n        value: \\\"5\\\"\\n      - name: PODS_AFFECTED_PERC\\n        value: \\\"\\\"\\n      - name: LIB\\n        value: litmus\\n      - name: TARGET_PODS\\n        value: \\\"\\\"\\n      - name: NODE_LABEL\\n        value: \\\"\\\"\\n      - name: SEQUENCE\\n        value: parallel\\n    labels:\\n      name: pod-delete\\n      app.kubernetes.io/part-of: litmus\\n      app.kubernetes.io/component: experiment-job\\n      app.kubernetes.io/version: 2.9.0\\n\"\n              }\n            }\n          ]\n        },\n        \"container\": {\n          \"args\": [\n            \"kubectl apply -f /tmp/pod-delete-dzb.yaml -n {{workflow.parameters.adminModeNamespace}} |  sleep 30\"\n          ],\n          \"command\": [\n            \"sh\",\n            \"-c\"\n          ],\n          \"image\": \"litmuschaos/k8s:2.9.0\"\n        }\n      },\n      {\n        \"name\": \"pod-delete-dzb\",\n        \"inputs\": {\n          \"artifacts\": [\n            {\n              \"name\": \"pod-delete-dzb\",\n              \"path\": \"/tmp/chaosengine-pod-delete-dzb.yaml\",\n              \"raw\": {\n                \"data\": \"apiVersion: litmuschaos.io/v1alpha1\\nkind: ChaosEngine\\nmetadata:\\n  namespace: \\\"{{workflow.parameters.adminModeNamespace}}\\\"\\n  generateName: pod-delete-dzb\\n  labels:\\n    instance_id: 95c74fb4-c25f-47b1-8283-94bbe3a3d166\\n    context: pod-delete-dzb_litmus\\n    workflow_name: custom-chaos-workflow-1657253766\\nspec:\\n  appinfo:\\n    appns: default\\n    applabel: app=nginx\\n    appkind: deployment\\n  engineState: active\\n  chaosServiceAccount: litmus-admin\\n  experiments:\\n    - name: pod-delete\\n      spec:\\n        components:\\n          env:\\n            - name: TOTAL_CHAOS_DURATION\\n              value: \\\"30\\\"\\n            - name: CHAOS_INTERVAL\\n              value: \\\"10\\\"\\n            - name: FORCE\\n              value: \\\"false\\\"\\n            - name: PODS_AFFECTED_PERC\\n              value: \\\"\\\"\\n        probe: []\\n  annotationCheck: \\\"false\\\"\\n\"\n              }\n            }\n          ]\n        },\n        \"container\": {\n          \"args\": [\n            \"-file=/tmp/chaosengine-pod-delete-dzb.yaml\",\n            \"-saveName=/tmp/engine-name\"\n          ],\n          \"image\": \"litmuschaos/litmus-checker:2.9.0\"\n        }\n      },\n      {\n        \"name\": \"revert-chaos\",\n        \"container\": {\n          \"image\": \"litmuschaos/k8s:2.9.0\",\n          \"command\": [\n            \"sh\",\n            \"-c\"\n          ],\n          \"args\": [\n            \"kubectl delete chaosengine -l 'instance_id in (95c74fb4-c25f-47b1-8283-94bbe3a3d166, )' -n {{workflow.parameters.adminModeNamespace}} \"\n          ]\n        }\n      }\n    ],\n    \"podGC\": {\n      \"strategy\": \"OnWorkflowCompletion\"\n    }\n  }\n}",
+            "cronSyntax": "",
+            "workflowName": "custom-chaos-workflow-1657253766",
+            "workflowDescription": "Custom Chaos Workflow",
+            "isCustomWorkflow": True,
+            "weightages": [
+                {
+                    "experimentName": "pod-delete-dzb",
+                    "weightage": 10
+                }
+            ],
+            "projectID": "b9055d57-442a-4e49-b60d-ec3da66d13fa",
+            "clusterID": "61f93ee9-9ebf-4c4e-ae07-d80b6cda7d62"
         }
-      ]
     },
-    "entrypoint": "custom-chaos",
-    "securityContext": {
-      "runAsNonRoot": true,
-      "runAsUser": 1000
-    },
-    "serviceAccountName": "argo-chaos",
-    "templates": [
-      {
-        "name": "custom-chaos",
-        "steps": [
-          [
-            {
-              "name": "install-chaos-experiments",
-              "template": "install-chaos-experiments"
-            }
-          ],
-          [
-            {
-              "name": "pod-delete-zw5",
-              "template": "pod-delete-zw5"
-            }
-          ],
-          [
-            {
-              "name": "revert-chaos",
-              "template": "revert-chaos"
-            }
-          ]
-        ]
-      },
-      {
-        "name": "install-chaos-experiments",
-        "inputs": {
-          "artifacts": [
-            {
-              "name": "pod-delete-zw5",
-              "path": "/tmp/pod-delete-zw5.yaml",
-              "raw": {
-                "data": "apiVersion: litmuschaos.io/v1alpha1\\ndescription:\\n  message: |\\n    Deletes a pod belonging to a deployment/statefulset/daemonset\\nkind: ChaosExperiment\\nmetadata:\\n  name: pod-delete\\n  labels:\\n    name: pod-delete\\n    app.kubernetes.io/part-of: litmus\\n    app.kubernetes.io/component: chaosexperiment\\n    app.kubernetes.io/version: latest\\nspec:\\n  definition:\\n    scope: Namespaced\\n    permissions:\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods\\n        verbs:\\n          - create\\n          - delete\\n          - get\\n          - list\\n          - patch\\n          - update\\n          - deletecollection\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - events\\n        verbs:\\n          - create\\n          - get\\n          - list\\n          - patch\\n          - update\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - configmaps\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods/log\\n        verbs:\\n          - get\\n          - list\\n          - watch\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods/exec\\n        verbs:\\n          - get\\n          - list\\n          - create\\n      - apiGroups:\\n          - apps\\n        resources:\\n          - deployments\\n          - statefulsets\\n          - replicasets\\n          - daemonsets\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - apps.openshift.io\\n        resources:\\n          - deploymentconfigs\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - replicationcontrollers\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - argoproj.io\\n        resources:\\n          - rollouts\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - batch\\n        resources:\\n          - jobs\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - delete\\n          - deletecollection\\n      - apiGroups:\\n          - litmuschaos.io\\n        resources:\\n          - chaosengines\\n          - chaosexperiments\\n          - chaosresults\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - patch\\n          - update\\n          - delete\\n    image: litmuschaos/go-runner:2.0.0\\n    imagePullPolicy: Always\\n    args:\\n      - -c\\n      - ./experiments -name pod-delete\\n    command:\\n      - /bin/bash\\n    env:\\n      - name: TOTAL_CHAOS_DURATION\\n        value: \\"15\\"\\n      - name: RAMP_TIME\\n        value: \\"\\"\\n      - name: FORCE\\n        value: \\"true\\"\\n      - name: CHAOS_INTERVAL\\n        value: \\"5\\"\\n      - name: PODS_AFFECTED_PERC\\n        value: \\"50\\"\\n      - name: LIB\\n        value: litmus\\n      - name: TARGET_PODS\\n        value: \\"\\"\\n      - name: NODE_LABEL\\n        value: \\"\\"\\n      - name: SEQUENCE\\n        value: parallel\\n    labels:\\n      name: pod-delete\\n      app.kubernetes.io/part-of: litmus\\n      app.kubernetes.io/component: experiment-job\\n      app.kubernetes.io/version: latest\\n"
-              }
-            }
-          ]
-        },
-        "container": {
-          "args": [
-            "kubectl apply -f /tmp/pod-delete-zw5.yaml -n {{workflow.parameters.adminModeNamespace}} |  sleep 30"
-          ],
-          "command": [
-            "sh",
-            "-c"
-          ],
-          "image": "litmuschaos/k8s:latest"
-        }
-      },
-      {
-        "name": "pod-delete-zw5",
-        "inputs": {
-          "artifacts": [
-            {
-              "name": "pod-delete-zw5",
-              "path": "/tmp/chaosengine-pod-delete-zw5.yaml",
-              "raw": {
-                "data": "apiVersion: litmuschaos.io/v1alpha1\\nkind: ChaosEngine\\nmetadata:\\n  namespace: \\"{{workflow.parameters.adminModeNamespace}}\\"\\n  generateName: pod-delete-zw5\\n  labels:\\n    instance_id: 8d042200-c626-4fcd-a83a-aa7d6c90b288\\n    context: pod-delete-zw5_litmus\\n    workflow_name: updated_workflow_name\\nspec:\\n  appinfo:\\n    appns: updated_namespace\\n    applabel: app=updated_deployment\\n    appkind: deployment\\n  engineState: active\\n  chaosServiceAccount: litmus-admin\\n  experiments:\\n    - name: pod-delete\\n      spec:\\n        components:\\n          env:\\n            - name: TOTAL_CHAOS_DURATION\\n              value: \\"30\\"\\n            - name: CHAOS_INTERVAL\\n              value: \\"10\\"\\n            - name: FORCE\\n              value: \\"false\\"\\n            - name: PODS_AFFECTED_PERC\\n              value: \\"50\\"\\n        probe: []\\n  annotationCheck: \\"false\\"\\n"
-              }
-            }
-          ]
-        },
-        "container": {
-          "args": [
-            "-file=/tmp/chaosengine-pod-delete-zw5.yaml",
-            "-saveName=/tmp/engine-name"
-          ],
-          "image": "litmuschaos/litmus-checker:latest"
-        }
-      },
-      {
-        "name": "revert-chaos",
-        "container": {
-          "image": "litmuschaos/k8s:latest",
-          "command": [
-            "sh",
-            "-c"
-          ],
-          "args": [
-            "kubectl delete chaosengine -l \'instance_id in (8d042200-c626-4fcd-a83a-aa7d6c90b288, )\' -n {{workflow.parameters.adminModeNamespace}} "
-          ]
-        }
-      }
-    ],
-    "imagePullSecrets": [
-      {
-        "name": ""
-      }
-    ],
-    "podGC": {
-      "strategy": "OnWorkflowCompletion"
-    }
-  }
-}''',
-                'cronSyntax': '',
-                'workflow_name': 'updated_workflow_name',
-                'workflow_description': 'Custom Chaos Workflow',
-                'isCustomWorkflow': isCustomWorkflow,
-                'weightages': [{'experiment_name': 'pod-delete',
-                                'weightage': 10}],
-                'project_id': 'updated_project_id',
-                'cluster_id': 'updated_cluster_id',
-            }},
-            'query': '''mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
-  createChaosWorkFlow(input: $ChaosWorkFlowInput) {
-    workflow_id
-    cronSyntax
-    workflow_name
-    workflow_description
-    isCustomWorkflow
-    __typename
-  }
+    "query": "mutation createChaosWorkFlow($request: ChaosWorkFlowRequest!) {\n  createChaosWorkFlow(request: $request) {\n    workflowID\n    cronSyntax\n    workflowName\n    workflowDescription\n    isCustomWorkflow\n    __typename\n  }\n}\n"
 }
-'''}
+
 
 
     ## replacing values
@@ -244,146 +126,27 @@ def get_network_latency_experiment_body(workflow_name, namespace, deployment):
     project_id = LITMUS_PROJECT_ID
     cluster_id = get_cluster_id()
 
-    data = {'operationName': 'createChaosWorkFlow',
-            'variables': {'ChaosWorkFlowInput': {
-                'workflow_manifest': '''{
-  "apiVersion": "argoproj.io/v1alpha1",
-  "kind": "Workflow",
-  "metadata": {
-    "name": "updated_workflow_name",
-    "namespace": "litmus",
-    "labels": {
-      "subject": "network-latency-chaos-workflow_litmus"
-    }
-  },
-  "spec": {
-    "arguments": {
-      "parameters": [
-        {
-          "name": "adminModeNamespace",
-          "value": "litmus"
+    data = {
+    "operationName": "createChaosWorkFlow",
+    "variables": {
+        "request": {
+            "workflowManifest": "{\n  \"apiVersion\": \"argoproj.io/v1alpha1\",\n  \"kind\": \"Workflow\",\n  \"metadata\": {\n    \"name\": \"custom-chaos-workflow-1657255493\",\n    \"namespace\": \"litmus\",\n    \"labels\": {\n      \"subject\": \"custom-chaos-workflow_litmus\"\n    }\n  },\n  \"spec\": {\n    \"arguments\": {\n      \"parameters\": [\n        {\n          \"name\": \"adminModeNamespace\",\n          \"value\": \"litmus\"\n        }\n      ]\n    },\n    \"entrypoint\": \"custom-chaos\",\n    \"securityContext\": {\n      \"runAsNonRoot\": true,\n      \"runAsUser\": 1000\n    },\n    \"serviceAccountName\": \"argo-chaos\",\n    \"templates\": [\n      {\n        \"name\": \"custom-chaos\",\n        \"steps\": [\n          [\n            {\n              \"name\": \"install-chaos-experiments\",\n              \"template\": \"install-chaos-experiments\"\n            }\n          ],\n          [\n            {\n              \"name\": \"pod-network-latency-fbc\",\n              \"template\": \"pod-network-latency-fbc\"\n            }\n          ],\n          [\n            {\n              \"name\": \"revert-chaos\",\n              \"template\": \"revert-chaos\"\n            }\n          ]\n        ]\n      },\n      {\n        \"name\": \"install-chaos-experiments\",\n        \"inputs\": {\n          \"artifacts\": [\n            {\n              \"name\": \"pod-network-latency-fbc\",\n              \"path\": \"/tmp/pod-network-latency-fbc.yaml\",\n              \"raw\": {\n                \"data\": \"apiVersion: litmuschaos.io/v1alpha1\\ndescription:\\n  message: |\\n    Injects network latency on pods belonging to an app deployment\\nkind: ChaosExperiment\\nmetadata:\\n  name: pod-network-latency\\n  labels:\\n    name: pod-network-latency\\n    app.kubernetes.io/part-of: litmus\\n    app.kubernetes.io/component: chaosexperiment\\n    app.kubernetes.io/version: 2.9.0\\nspec:\\n  definition:\\n    scope: Namespaced\\n    permissions:\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods\\n        verbs:\\n          - create\\n          - delete\\n          - get\\n          - list\\n          - patch\\n          - update\\n          - deletecollection\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - events\\n        verbs:\\n          - create\\n          - get\\n          - list\\n          - patch\\n          - update\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - configmaps\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods/log\\n        verbs:\\n          - get\\n          - list\\n          - watch\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - pods/exec\\n        verbs:\\n          - get\\n          - list\\n          - create\\n      - apiGroups:\\n          - apps\\n        resources:\\n          - deployments\\n          - statefulsets\\n          - replicasets\\n          - daemonsets\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - apps.openshift.io\\n        resources:\\n          - deploymentconfigs\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - \\\"\\\"\\n        resources:\\n          - replicationcontrollers\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - argoproj.io\\n        resources:\\n          - rollouts\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - batch\\n        resources:\\n          - jobs\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - delete\\n          - deletecollection\\n      - apiGroups:\\n          - litmuschaos.io\\n        resources:\\n          - chaosengines\\n          - chaosexperiments\\n          - chaosresults\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - patch\\n          - update\\n          - delete\\n    image: litmuschaos/go-runner:2.9.0\\n    imagePullPolicy: Always\\n    args:\\n      - -c\\n      - ./experiments -name pod-network-latency\\n    command:\\n      - /bin/bash\\n    env:\\n      - name: TARGET_CONTAINER\\n        value: \\\"\\\"\\n      - name: NETWORK_INTERFACE\\n        value: eth0\\n      - name: LIB_IMAGE\\n        value: litmuschaos/go-runner:2.9.0\\n      - name: TC_IMAGE\\n        value: gaiadocker/iproute2\\n      - name: NETWORK_LATENCY\\n        value: \\\"2000\\\"\\n      - name: TOTAL_CHAOS_DURATION\\n        value: \\\"60\\\"\\n      - name: RAMP_TIME\\n        value: \\\"\\\"\\n      - name: JITTER\\n        value: \\\"0\\\"\\n      - name: LIB\\n        value: litmus\\n      - name: PODS_AFFECTED_PERC\\n        value: \\\"\\\"\\n      - name: TARGET_PODS\\n        value: \\\"\\\"\\n      - name: CONTAINER_RUNTIME\\n        value: docker\\n      - name: DESTINATION_IPS\\n        value: \\\"\\\"\\n      - name: DESTINATION_HOSTS\\n        value: \\\"\\\"\\n      - name: SOCKET_PATH\\n        value: /var/run/docker.sock\\n      - name: NODE_LABEL\\n        value: \\\"\\\"\\n      - name: SEQUENCE\\n        value: parallel\\n    labels:\\n      name: pod-network-latency\\n      app.kubernetes.io/part-of: litmus\\n      app.kubernetes.io/component: experiment-job\\n      app.kubernetes.io/runtime-api-usage: \\\"true\\\"\\n      app.kubernetes.io/version: 2.9.0\\n\"\n              }\n            }\n          ]\n        },\n        \"container\": {\n          \"args\": [\n            \"kubectl apply -f /tmp/pod-network-latency-fbc.yaml -n {{workflow.parameters.adminModeNamespace}} |  sleep 30\"\n          ],\n          \"command\": [\n            \"sh\",\n            \"-c\"\n          ],\n          \"image\": \"litmuschaos/k8s:2.9.0\"\n        }\n      },\n      {\n        \"name\": \"pod-network-latency-fbc\",\n        \"inputs\": {\n          \"artifacts\": [\n            {\n              \"name\": \"pod-network-latency-fbc\",\n              \"path\": \"/tmp/chaosengine-pod-network-latency-fbc.yaml\",\n              \"raw\": {\n                \"data\": \"apiVersion: litmuschaos.io/v1alpha1\\nkind: ChaosEngine\\nmetadata:\\n  namespace: \\\"{{workflow.parameters.adminModeNamespace}}\\\"\\n  generateName: pod-network-latency-fbc\\n  labels:\\n    instance_id: 36de4c29-e81c-469b-9c33-8d9e04b451c6\\n    context: pod-network-latency-fbc_litmus\\n    workflow_name: custom-chaos-workflow-1657255493\\nspec:\\n  engineState: active\\n  appinfo:\\n    appns: default\\n    applabel: app=nginx\\n    appkind: deployment\\n  chaosServiceAccount: litmus-admin\\n  experiments:\\n    - name: pod-network-latency\\n      spec:\\n        components:\\n          env:\\n            - name: TOTAL_CHAOS_DURATION\\n              value: \\\"60\\\"\\n            - name: NETWORK_LATENCY\\n              value: \\\"2000\\\"\\n            - name: JITTER\\n              value: \\\"0\\\"\\n            - name: CONTAINER_RUNTIME\\n              value: docker\\n            - name: SOCKET_PATH\\n              value: /var/run/docker.sock\\n            - name: PODS_AFFECTED_PERC\\n              value: \\\"\\\"\\n        probe: []\\n  annotationCheck: \\\"false\\\"\\n\"\n              }\n            }\n          ]\n        },\n        \"container\": {\n          \"args\": [\n            \"-file=/tmp/chaosengine-pod-network-latency-fbc.yaml\",\n            \"-saveName=/tmp/engine-name\"\n          ],\n          \"image\": \"litmuschaos/litmus-checker:2.9.0\"\n        }\n      },\n      {\n        \"name\": \"revert-chaos\",\n        \"container\": {\n          \"image\": \"litmuschaos/k8s:2.9.0\",\n          \"command\": [\n            \"sh\",\n            \"-c\"\n          ],\n          \"args\": [\n            \"kubectl delete chaosengine -l 'instance_id in (36de4c29-e81c-469b-9c33-8d9e04b451c6, )' -n {{workflow.parameters.adminModeNamespace}} \"\n          ]\n        }\n      }\n    ],\n    \"podGC\": {\n      \"strategy\": \"OnWorkflowCompletion\"\n    }\n  }\n}",
+            "cronSyntax": "",
+            "workflowName": "custom-chaos-workflow-1657255493",
+            "workflowDescription": "Custom Chaos Workflow",
+            "isCustomWorkflow": true,
+            "weightages": [
+                {
+                    "experimentName": "pod-network-latency-fbc",
+                    "weightage": 10
+                }
+            ],
+            "projectID": "b9055d57-442a-4e49-b60d-ec3da66d13fa",
+            "clusterID": "61f93ee9-9ebf-4c4e-ae07-d80b6cda7d62"
         }
-      ]
     },
-    "entrypoint": "custom-chaos",
-    "securityContext": {
-      "runAsNonRoot": true,
-      "runAsUser": 1000
-    },
-    "serviceAccountName": "argo-chaos",
-    "templates": [
-      {
-        "name": "custom-chaos",
-        "steps": [
-          [
-            {
-              "name": "install-chaos-experiments",
-              "template": "install-chaos-experiments"
-            }
-          ],
-          [
-            {
-              "name": "pod-network-latency-5kn",
-              "template": "pod-network-latency-5kn"
-            }
-          ],
-          [
-            {
-              "name": "revert-chaos",
-              "template": "revert-chaos"
-            }
-          ]
-        ]
-      },
-      {
-        "name": "install-chaos-experiments",
-        "inputs": {
-          "artifacts": [
-            {
-              "name": "pod-network-latency-5kn",
-              "path": "/tmp/pod-network-latency-5kn.yaml",
-              "raw": {
-                "data": "apiVersion: litmuschaos.io/v1alpha1\\ndescription:\\n  message: |\\n    Injects network latency on pods belonging to an app deployment\\nkind: ChaosExperiment\\nmetadata:\\n  name: pod-network-latency\\n  labels:\\n    name: pod-network-latency\\n    app.kubernetes.io/part-of: litmus\\n    app.kubernetes.io/component: chaosexperiment\\n    app.kubernetes.io/version: latest\\nspec:\\n  definition:\\n    scope: Namespaced\\n    permissions:\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods\\n        verbs:\\n          - create\\n          - delete\\n          - get\\n          - list\\n          - patch\\n          - update\\n          - deletecollection\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - events\\n        verbs:\\n          - create\\n          - get\\n          - list\\n          - patch\\n          - update\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - configmaps\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods/log\\n        verbs:\\n          - get\\n          - list\\n          - watch\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - pods/exec\\n        verbs:\\n          - get\\n          - list\\n          - create\\n      - apiGroups:\\n          - apps\\n        resources:\\n          - deployments\\n          - statefulsets\\n          - replicasets\\n          - daemonsets\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - apps.openshift.io\\n        resources:\\n          - deploymentconfigs\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - \\"\\"\\n        resources:\\n          - replicationcontrollers\\n        verbs:\\n          - get\\n          - list\\n      - apiGroups:\\n          - argoproj.io\\n        resources:\\n          - rollouts\\n        verbs:\\n          - list\\n          - get\\n      - apiGroups:\\n          - batch\\n        resources:\\n          - jobs\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - delete\\n          - deletecollection\\n      - apiGroups:\\n          - litmuschaos.io\\n        resources:\\n          - chaosengines\\n          - chaosexperiments\\n          - chaosresults\\n        verbs:\\n          - create\\n          - list\\n          - get\\n          - patch\\n          - update\\n          - delete\\n    image: 405524983081.dkr.ecr.ap-southeast-1.amazonaws.com/aella-xplatform-ecr/facility/litmuschaos/go-runner\\n    imagePullPolicy: Always\\n    args:\\n      - -c\\n      - ./experiments -name pod-network-latency\\n    command:\\n      - /bin/bash\\n    env:\\n      - name: TARGET_CONTAINER\\n        value: \\"\\"\\n      - name: NETWORK_INTERFACE\\n        value: eth0\\n      - name: LIB_IMAGE\\n        value: litmuschaos/go-runner:latest\\n      - name: TC_IMAGE\\n        value: gaiadocker/iproute2\\n      - name: NETWORK_LATENCY\\n        value: \\"2000\\"\\n      - name: TOTAL_CHAOS_DURATION\\n        value: \\"60\\"\\n      - name: RAMP_TIME\\n        value: \\"\\"\\n      - name: JITTER\\n        value: \\"0\\"\\n      - name: LIB\\n        value: litmus\\n      - name: PODS_AFFECTED_PERC\\n        value: \\"50\\"\\n      - name: TARGET_PODS\\n        value: \\"\\"\\n      - name: CONTAINER_RUNTIME\\n        value: docker\\n      - name: DESTINATION_IPS\\n        value: \\"\\"\\n      - name: DESTINATION_HOSTS\\n        value: \\"\\"\\n      - name: SOCKET_PATH\\n        value: /var/run/docker.sock\\n      - name: NODE_LABEL\\n        value: \\"\\"\\n      - name: SEQUENCE\\n        value: parallel\\n    labels:\\n      name: pod-network-latency\\n      app.kubernetes.io/part-of: litmus\\n      app.kubernetes.io/component: experiment-job\\n      app.kubernetes.io/runtime-api-usage: \\"true\\"\\n      app.kubernetes.io/version: latest\\n"
-              }
-            }
-          ]
-        },
-        "container": {
-          "args": [
-            "kubectl apply -f /tmp/pod-network-latency-5kn.yaml -n {{workflow.parameters.adminModeNamespace}} |  sleep 30"
-          ],
-          "command": [
-            "sh",
-            "-c"
-          ],
-          "image": "405524983081.dkr.ecr.ap-southeast-1.amazonaws.com/aella-xplatform-ecr/facility/litmuschaos/k8s:latest"
-        }
-      },
-      {
-        "name": "pod-network-latency-5kn",
-        "inputs": {
-          "artifacts": [
-            {
-              "name": "pod-network-latency-5kn",
-              "path": "/tmp/chaosengine-pod-network-latency-5kn.yaml",
-              "raw": {
-                "data": "apiVersion: litmuschaos.io/v1alpha1\\nkind: ChaosEngine\\nmetadata:\\n  namespace: \\"{{workflow.parameters.adminModeNamespace}}\\"\\n  generateName: pod-network-latency-5kn\\n  labels:\\n    instance_id: 543914de-580e-45fb-86de-016c820aed11\\n    context: pod-network-latency-5kn_litmus\\n    workflow_name: updated_workflow_name\\nspec:\\n  engineState: active\\n  appinfo:\\n    appns: updated_namespace\\n    applabel: app=updated_deployment\\n    appkind: deployment\\n  chaosServiceAccount: litmus-admin\\n  experiments:\\n    - name: pod-network-latency\\n      spec:\\n        components:\\n          env:\\n            - name: TOTAL_CHAOS_DURATION\\n              value: \\"60\\"\\n            - name: NETWORK_LATENCY\\n              value: \\"2000\\"\\n            - name: JITTER\\n              value: \\"0\\"\\n            - name: CONTAINER_RUNTIME\\n              value: docker\\n            - name: SOCKET_PATH\\n              value: /var/run/docker.sock\\n            - name: PODS_AFFECTED_PERC\\n              value: \\"50\\"\\n        probe: []\\n  annotationCheck: \\"false\\"\\n"
-              }
-            }
-          ]
-        },
-        "container": {
-          "args": [
-            "-file=/tmp/chaosengine-pod-network-latency-5kn.yaml",
-            "-saveName=/tmp/engine-name"
-          ],
-          "image": "405524983081.dkr.ecr.ap-southeast-1.amazonaws.com/aella-xplatform-ecr/facility/litmuschaos/litmus-checker:latest"
-        }
-      },
-      {
-        "name": "revert-chaos",
-        "container": {
-          "image": "405524983081.dkr.ecr.ap-southeast-1.amazonaws.com/aella-xplatform-ecr/facility/litmuschaos/k8s:latest",
-          "command": [
-            "sh",
-            "-c"
-          ],
-          "args": [
-            "kubectl delete chaosengine -l \'instance_id in (543914de-580e-45fb-86de-016c820aed11, )\' -n {{workflow.parameters.adminModeNamespace}} "
-          ]
-        }
-      }
-    ],
-    "imagePullSecrets": [
-      {
-        "name": ""
-      }
-    ],
-    "podGC": {
-      "strategy": "OnWorkflowCompletion"
-    }
-  }
-}''',
-                'cronSyntax': '',
-                'workflow_name': 'updated_workflow_name',
-                'workflow_description': 'Custom Chaos Workflow',
-                'isCustomWorkflow': isCustomWorkflow,
-                'weightages': [{'experiment_name': 'pod-network-latency',
-                                'weightage': 10}],
-                'project_id': 'updated_project_id',
-                'cluster_id': 'updated_cluster_id',
-            }},
-            'query': '''mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
-  createChaosWorkFlow(input: $ChaosWorkFlowInput) {
-    workflow_id
-    cronSyntax
-    workflow_name
-    workflow_description
-    isCustomWorkflow
-    __typename
-  }
+    "query": "mutation createChaosWorkFlow($request: ChaosWorkFlowRequest!) {\n  createChaosWorkFlow(request: $request) {\n    workflowID\n    cronSyntax\n    workflowName\n    workflowDescription\n    isCustomWorkflow\n    __typename\n  }\n}\n"
 }
-'''}
 
     ## replacing values
     updated_workflow_manifest_str = data['variables']['ChaosWorkFlowInput']['workflow_manifest'].replace(
