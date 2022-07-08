@@ -1,7 +1,7 @@
 {
     "litmus":{
-        "litmus_url":"https://litmus-dev.np.aella.tech",
-        "litmus_project_id":"5539c642-f80f-443d-a21b-406379f8df48",
+        "litmus_url":"http://a8155901c8f774540873a6814e70b50f-1024036079.us-east-1.elb.amazonaws.com:9091",
+        "litmus_project_id":"b9055d57-442a-4e49-b60d-ec3da66d13fa",
         "env": "dev"
     },
     "pod_delete":{
