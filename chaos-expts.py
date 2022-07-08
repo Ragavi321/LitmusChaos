@@ -224,8 +224,8 @@ def load_config_file():
 
 #############################################################################################################
 def read_config_file():
-    env = os.environ['DEPLOYMENT_ENV']
-    project = os.environ['Project']
+    env = os.environ['environment_name']
+    project = os.environ['project_name']
     print('PROJECT NAME : ' + project)
     print('ENV NAME : ' + env)
     json_config_path = os.path.join(sys.path[0], project + "/" + "config_" + env + ".json")
